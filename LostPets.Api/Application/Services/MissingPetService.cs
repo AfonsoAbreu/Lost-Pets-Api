@@ -35,7 +35,7 @@ namespace Application.Services
             {
                 throw new ValidationDomainException("A MissingPet must have at least one Sighting");
             }
-            else if (missingPet.Comments != null && missingPet.Comments.Count != 0)
+            else if (missingPet.Comments == null || missingPet.Comments.Count != 0)
             {
                 throw new ValidationDomainException("A MissinPet must not be created with Comments.");
             }
