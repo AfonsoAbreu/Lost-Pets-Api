@@ -170,5 +170,26 @@ namespace Presentation.WebApi.Controllers
 
             return NoContent();
         }
+
+        [HttpDelete("{id}/deactivate"), Authorize]
+        public async Task<IActionResult> Deactivate([FromRoute] Guid id)
+        {
+            MissingPet? missingPet = _missingPetService.GetById(id);
+
+            if (missingPet == null)
+            {
+                return NotFound();
+            }
+
+            User? user = await GetCurrentUser();
+            if (user?.Id != missingPet.UserId)
+            {
+                return Forbid();
+            }
+
+            _missingPetService.Deactivate(missingPet);
+
+            return NoContent();
+        }
     }
 }

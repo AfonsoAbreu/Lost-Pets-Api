@@ -361,3 +361,4 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/LostPets.Api/Presentation.WebApi/Properties/ServiceDependencies/lost-pets-dev - Web Deploy/profile.arm.json

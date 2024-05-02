@@ -102,5 +102,10 @@ namespace Infrastructure.Repositories.Base
         {
             GetEntry(entity).State = EntityState.Detached;
         }
+
+        public void Attach(T entity)
+        {
+            _context.Attach(entity);
+        }
     }
 }

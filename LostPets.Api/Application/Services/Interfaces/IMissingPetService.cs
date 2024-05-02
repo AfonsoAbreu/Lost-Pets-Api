@@ -10,5 +10,6 @@ namespace Application.Services.Interfaces
         MissingPet? GetById(Guid id);
         MissingPet Update(MissingPet missingPet);
         void Remove(MissingPet missingPet);
+        void Deactivate(MissingPet missingPet);
     }
 }

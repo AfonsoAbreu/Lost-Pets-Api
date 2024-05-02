@@ -100,5 +100,12 @@ namespace Application.Services
 
             SaveChanges();
         }
+
+        public void Deactivate(MissingPet missingPet)
+        {
+            _missingPetRepository.Attach(missingPet);
+            missingPet.Status = MissingPetStatusEnum.DEACTIVATED;
+            SaveChanges();
+        }
     }
 }
