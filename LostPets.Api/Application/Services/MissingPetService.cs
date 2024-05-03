@@ -54,7 +54,7 @@ namespace Application.Services
                 _missingPetRepository.ExplicitLoadCollection(missingPet, entity => entity.Sightings);
                 _missingPetRepository.ExplicitLoadCollection(missingPet, entity => entity.Comments);
 
-                missingPet.Comments = filterByRootLevelComments(missingPet.Comments);
+                missingPet.Comments = FilterByRootLevelComments(missingPet.Comments);
             }
 
             return missingPet;
@@ -66,12 +66,12 @@ namespace Application.Services
 
             foreach (MissingPet missingPet in missingPets)
             {
-                missingPet.Comments = filterByRootLevelComments(missingPet.Comments);
+                missingPet.Comments = FilterByRootLevelComments(missingPet.Comments);
                 yield return missingPet;
             }
         }
 
-        private ICollection<Comment>? filterByRootLevelComments(ICollection<Comment>? comments)
+        private static List<Comment>? FilterByRootLevelComments(ICollection<Comment>? comments)
         {
             return comments
                 ?.Where(comment => comment.AwnsersTo == null)
