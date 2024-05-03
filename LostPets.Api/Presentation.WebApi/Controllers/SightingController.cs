@@ -6,8 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Infrastructure.Data.Entities;
 using Presentation.WebApi.Controllers.Base;
 using AutoMapper;
-using NetTopologySuite.Geometries;
-using Application.Exceptions;
+using Presentation.WebApi.Data.DTOs.Variations;
 
 
 namespace Presentation.WebApi.Controllers
@@ -30,14 +29,10 @@ namespace Presentation.WebApi.Controllers
         [ProducesResponseType(typeof(SightingDTO), StatusCodes.Status201Created)]
         public async Task<ActionResult<SightingDTO>> Add([FromBody] SightingDTOWithRequiredMissingPetId sightingDto)
         {
-            User? currentUser = await GetCurrentUser();
+            User? user = await GetCurrentUser();
+            UserDTO userDTO = _mapper.Map<UserDTO>(user);
 
-            if (currentUser == null)
-            {
-                return Unauthorized();
-            }
-
-            sightingDto.userId = currentUser.Id;
+            sightingDto.user = userDTO;
 
             Sighting sighting = _mapper.Map<Sighting>(sightingDto);
 

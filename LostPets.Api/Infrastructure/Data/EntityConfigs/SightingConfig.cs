@@ -24,6 +24,10 @@ namespace Infrastructure.Data.EntityConfigs
                 .HasForeignKey(e => e.MissingPetId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.ClientNoAction);
+
+            builder
+                .Navigation(e => e.User)
+                .AutoInclude();
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace Infrastructure.Data.Entities.Base
 {
-    public abstract class BaseEntity : IEquatable<BaseEntity?>
+    public abstract class BaseEntity : IBaseEntity, IEquatable<BaseEntity?>
     {
         public BaseEntity() 
         { 

@@ -30,6 +30,7 @@ namespace Infrastructure.Data
             #region Entity Configs
             base.OnModelCreating(builder);
 
+            new UserConfig().Configure(builder.Entity<User>());
             new PetConfig().Configure(builder.Entity<Pet>());
             new MissingPetConfig().Configure(builder.Entity<MissingPet>());
             new CommentConfig().Configure(builder.Entity<Comment>());
@@ -69,7 +70,7 @@ namespace Infrastructure.Data
         {
             var entries =
                 from entry in ChangeTracker.Entries()
-                where entry.Entity is BaseEntity
+                where entry.Entity is IBaseEntity
                     && entry.State == EntityState.Modified
                 select entry;
 
@@ -77,7 +78,7 @@ namespace Infrastructure.Data
             {
                 DateTime now = DateTime.UtcNow;
 
-                ((BaseEntity)entry.Entity).UpdatedAt = now;
+                ((IBaseEntity)entry.Entity).UpdatedAt = now;
             }
         }
 

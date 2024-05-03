@@ -2,11 +2,10 @@
 using Presentation.WebApi.Data.DTOs.Base;
 using System.ComponentModel.DataAnnotations;
 
-namespace Presentation.WebApi.Data.DTOs
+namespace Presentation.WebApi.Data.DTOs.Variations
 {
-    public class MissingPetDTO : BaseEntityDTO
+    public class MissingPetDTOWithOptionalSightings : BaseEntityDTO
     {
-        [Required, MinLength(1)]
         public ICollection<SightingDTO>? sightings { get; set; }
         public UserDTO? user { get; set; }
         [Required]

@@ -8,6 +8,7 @@ using Presentation.WebApi.Controllers.Base;
 using AutoMapper;
 using NetTopologySuite.Geometries;
 using Application.Exceptions;
+using Presentation.WebApi.Data.DTOs.Variations;
 
 
 namespace Presentation.WebApi.Controllers
@@ -30,17 +31,13 @@ namespace Presentation.WebApi.Controllers
         [ProducesResponseType(typeof(MissingPetDTO), StatusCodes.Status201Created)]
         public async Task<ActionResult<MissingPetDTO>> Add([FromBody] MissingPetDTO missingPetDto)
         {
-            User? currentUser = await GetCurrentUser();
+            User? user = await GetCurrentUser();
+            UserDTO userDTO = _mapper.Map<UserDTO>(user);
 
-            if (currentUser == null)
-            {
-                return Unauthorized();
-            }
-
-            missingPetDto.userId = currentUser.Id;
+            missingPetDto.user = userDTO;
             missingPetDto.sightings
                 ?.ToList()
-                .ForEach(s => s.userId = currentUser.Id);
+                .ForEach(s => s.user = userDTO);
 
             MissingPet missingPet = _mapper.Map<MissingPet>(missingPetDto);
 
@@ -97,12 +94,13 @@ namespace Presentation.WebApi.Controllers
         }
 
         [HttpPut("{id}"), Authorize]
-        public async Task<ActionResult<MissingPetDTO>> Edit([FromRoute] Guid id, [FromBody] MissingPetDTO missingPetDTO)
+        public async Task<ActionResult<MissingPetDTO>> Edit([FromRoute] Guid id, [FromBody] MissingPetDTOWithOptionalSightings missingPetDTO)
         {
             User? user = await GetCurrentUser();
+            UserDTO userDTO = _mapper.Map<UserDTO>(user);
 
             missingPetDTO.id = id;
-            missingPetDTO.userId = user?.Id;
+            missingPetDTO.user = userDTO;
 
             foreach (var sighting in missingPetDTO.sightings ?? [])
             {
@@ -111,14 +109,14 @@ namespace Presentation.WebApi.Controllers
             foreach (var comment in missingPetDTO.comments ?? [])
             {
                 comment.missingPetId = id;
-                comment.userId ??= user?.Id;
+                comment.user ??= userDTO;
             }
 
             missingPetDTO.sightings = missingPetDTO.sightings
-                ?.Where(sighting => sighting.userId == user?.Id)
+                ?.Where(sighting => sighting.user == userDTO)
                 .ToList();
             missingPetDTO.comments = missingPetDTO.comments
-                ?.Where(comment => comment.userId == user?.Id)
+                ?.Where(comment => comment.user == userDTO)
                 .ToList();
 
             MissingPet receivedMissingPet = _mapper.Map<MissingPet>(missingPetDTO);
@@ -133,7 +131,7 @@ namespace Presentation.WebApi.Controllers
             }
             catch (MismatchedUserDomainException ex)
             {
-                return Forbid(ex.Message);
+                return StatusCode(StatusCodes.Status403Forbidden, ex.Message);
             }
             catch (MismatchedRelationDomainException ex)
             {

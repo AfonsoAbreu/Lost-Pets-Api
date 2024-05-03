@@ -96,7 +96,7 @@ namespace Application.Services
 
             if (missingPet.Sightings.Count != 0)
             {
-            existingMissingPet.Sightings = _sightingService.AddOrUpdate(missingPet.Sightings, false).ToList();
+                existingMissingPet.Sightings = _sightingService.AddOrUpdate(missingPet.Sightings, false).ToList();
             }
 
             if (missingPet.Comments != null && missingPet.Comments.Count != 0)

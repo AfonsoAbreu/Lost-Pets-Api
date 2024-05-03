@@ -31,14 +31,10 @@ namespace Presentation.WebApi.Controllers
         [ProducesResponseType(typeof(CommentDTO), StatusCodes.Status201Created)]
         public async Task<ActionResult<CommentDTO>> Add([FromBody] CommentDTOWithRequiredMissingPetId commentDto)
         {
-            User? currentUser = await GetCurrentUser();
+            User? user = await GetCurrentUser();
+            UserDTO userDTO = _mapper.Map<UserDTO>(user);
 
-            if (currentUser == null)
-            {
-                return Unauthorized();
-            }
-
-            commentDto.userId = currentUser.Id;
+            commentDto.user = userDTO;
 
             Comment comment = _mapper.Map<Comment>(commentDto);
 
@@ -74,9 +70,10 @@ namespace Presentation.WebApi.Controllers
         public async Task<ActionResult<CommentDTO>> Edit([FromRoute] Guid id, [FromBody] CommentDTO commentDto)
         {
             User? user = await GetCurrentUser();
+            UserDTO userDTO = _mapper.Map<UserDTO>(user);
 
             commentDto.id = id;
-            commentDto.userId = user?.Id;
+            commentDto.user = userDTO;
 
             Comment receivedComment = _mapper.Map<Comment>(commentDto);
 

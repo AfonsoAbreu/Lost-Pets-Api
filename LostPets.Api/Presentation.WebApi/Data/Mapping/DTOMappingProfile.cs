@@ -23,10 +23,12 @@ namespace Presentation.WebApi.Data.Mapping
             CreateMap<LocationDTO, Point>()
                 .ConvertUsing<LocationToTopologyPoint>();
             CreateMap<MissingPetDTO, MissingPet>();
+            CreateMap<MissingPetDTOWithOptionalSightings, MissingPet>();
             CreateMap<PetDTO, Pet>();
             CreateMap<SightingDTO, Sighting>();
             CreateMap<SightingDTOWithRequiredMissingPetId, Sighting>();
             CreateMap<CommentDTOWithRequiredMissingPetId, Comment>();
+            CreateMap<UserDTO, User>();
 
             #endregion
 
@@ -36,10 +38,12 @@ namespace Presentation.WebApi.Data.Mapping
             CreateMap<Point, LocationDTO>()
                 .ConvertUsing<TopologyPointToLocation>();
             CreateMap<MissingPet, MissingPetDTO>();
+            CreateMap<MissingPet, MissingPetDTOWithOptionalSightings>();
             CreateMap<Pet, PetDTO>();
             CreateMap<Sighting, SightingDTO>();
             CreateMap<Sighting, SightingDTOWithRequiredMissingPetId>();
             CreateMap<Comment, CommentDTOWithRequiredMissingPetId>();
+            CreateMap<User, UserDTO>();
 
             #endregion
 

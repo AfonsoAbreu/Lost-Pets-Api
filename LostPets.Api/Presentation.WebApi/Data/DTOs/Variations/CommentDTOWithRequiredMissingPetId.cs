@@ -5,7 +5,7 @@ namespace Presentation.WebApi.Data.DTOs.Variations
 {
     public class CommentDTOWithRequiredMissingPetId : BaseEntityDTO
     {
-        public Guid? userId { get; set; }
+        public UserDTO? user { get; set; }
         public Guid? awnsersTo { get; set; }
         [Required]
         public Guid? missingPetId { get; set; }

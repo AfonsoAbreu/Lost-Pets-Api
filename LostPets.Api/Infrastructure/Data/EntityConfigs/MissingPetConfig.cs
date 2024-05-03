@@ -28,6 +28,10 @@ namespace Infrastructure.Data.EntityConfigs
             builder
                 .Navigation(e => e.Pet)
                 .AutoInclude();
+
+            builder
+                .Navigation(e => e.User)
+                .AutoInclude();
         }
     }
 }

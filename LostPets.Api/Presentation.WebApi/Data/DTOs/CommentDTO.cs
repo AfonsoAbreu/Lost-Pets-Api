@@ -5,7 +5,7 @@ namespace Presentation.WebApi.Data.DTOs
 {
     public class CommentDTO : BaseEntityDTO
     {
-        public Guid? userId { get; set; }
+        public UserDTO? user { get; set; }
         public Guid? awnsersTo { get; set; }
         public Guid? missingPetId { get; set; }
         public ICollection<CommentDTO>? awnsers { get; set; }

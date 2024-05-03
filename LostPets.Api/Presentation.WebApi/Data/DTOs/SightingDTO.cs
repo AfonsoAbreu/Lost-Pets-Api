@@ -9,7 +9,7 @@ namespace Presentation.WebApi.Data.DTOs
         public DateTime? sightingDate { get; set; }
         [Required]
         public LocationDTO? location { get; set; }
-        public Guid? userId { get; set; }
+        public UserDTO? user { get; set; }
         public Guid? missingPetId { get; set; }
         public string? description { get; set; }
     }
