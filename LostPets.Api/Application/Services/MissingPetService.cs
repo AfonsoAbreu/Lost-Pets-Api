@@ -93,9 +93,13 @@ namespace Application.Services
 
             existingMissingPet.Status = missingPet.Status;
             existingMissingPet.Pet = _petService.Update(missingPet.Pet, false);
-            existingMissingPet.Sightings = _sightingService.AddOrUpdate(missingPet.Sightings, false).ToList();
 
-            if (missingPet.Comments != null)
+            if (missingPet.Sightings.Count != 0)
+            {
+            existingMissingPet.Sightings = _sightingService.AddOrUpdate(missingPet.Sightings, false).ToList();
+            }
+
+            if (missingPet.Comments != null && missingPet.Comments.Count != 0)
             {
                 existingMissingPet.Comments = _commentService.AddOrUpdate(missingPet.Comments, false).ToList();
             }
