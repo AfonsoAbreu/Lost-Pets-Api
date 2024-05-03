@@ -98,16 +98,10 @@ namespace Presentation.WebApi.Controllers
         [HttpPut("{id}"), Authorize]
         public async Task<ActionResult<MissingPetDTO>> Edit([FromRoute] Guid id, [FromBody] MissingPetDTO missingPetDTO)
         {
-            if (id != missingPetDTO.id)
-            {
-                return NotFound();
-            }
-
             User? user = await GetCurrentUser();
-            if (user?.Id != missingPetDTO.userId)
-            {
-                return Forbid();
-            }
+
+            missingPetDTO.id = id;
+            missingPetDTO.userId = user?.Id;
 
             foreach (var sighting in missingPetDTO.sightings ?? [])
             {
