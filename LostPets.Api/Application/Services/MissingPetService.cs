@@ -53,6 +53,8 @@ namespace Application.Services
             {
                 _missingPetRepository.ExplicitLoadCollection(missingPet, entity => entity.Sightings);
                 _missingPetRepository.ExplicitLoadCollection(missingPet, entity => entity.Comments);
+
+                missingPet.Comments = filterByRootLevelComments(missingPet.Comments);
             }
 
             return missingPet;
@@ -60,7 +62,20 @@ namespace Application.Services
 
         public IEnumerable<MissingPet> SearchBylocationAndRadius(Point location, double radius, int page = 1, int itemsPerPage = 10)
         {
-            return _missingPetRepository.SearchBylocationAndRadius(location, radius, page, itemsPerPage);
+            IEnumerable<MissingPet> missingPets = _missingPetRepository.SearchBylocationAndRadius(location, radius, page, itemsPerPage);
+
+            foreach (MissingPet missingPet in missingPets)
+            {
+                missingPet.Comments = filterByRootLevelComments(missingPet.Comments);
+                yield return missingPet;
+            }
+        }
+
+        private ICollection<Comment>? filterByRootLevelComments(ICollection<Comment>? comments)
+        {
+            return comments
+                ?.Where(comment => comment.AwnsersTo == null)
+                .ToList();
         }
 
         public MissingPet Update(MissingPet missingPet)

@@ -83,9 +83,10 @@ namespace Presentation.WebApi.Controllers
             };
             Point location = _mapper.Map<Point>(locationDTO);
 
-            IEnumerable<MissingPet> missingPets = _missingPetService.SearchBylocationAndRadius(location, radius, page, itemsPerPage);
+            List<MissingPet> missingPets = _missingPetService.SearchBylocationAndRadius(location, radius, page, itemsPerPage)
+                .ToList();
 
-            if (!missingPets.Any())
+            if (missingPets.Count == 0)
             {
                 return NoContent();
             }
