@@ -52,7 +52,7 @@ namespace Application.Services
             {
                 throw new MismatchedUserDomainException(MismatchedUserDomainException.DefaultMessage("Comment"));
             }
-            else if (existingComment.MissingPetId != comment.MissingPetId)
+            else if (comment.MissingPetId != null && existingComment.MissingPetId != comment.MissingPetId)
             {
                 throw new MismatchedRelationDomainException(MismatchedRelationDomainException.DefaultMessage("Comment", "missingPetId"));
             }
@@ -84,6 +84,21 @@ namespace Application.Services
         public IEnumerable<Comment> Update(IEnumerable<Comment> comments, bool withSaveChanges = true)
         {
             return comments.Select(comment => Update(comment, withSaveChanges)).ToList();
+        }
+
+        public Comment? GetById(Guid id)
+        {
+            Comment? comment = _commentRepository.GetById(id);
+
+            return comment;
+        }
+
+        public void Remove(Comment comment)
+        {
+            _commentRepository.RemoveWhere(c => c.AwnsersTo == comment.Id);
+
+            _commentRepository.Remove(comment);
+            SaveChanges();
         }
     }
 }

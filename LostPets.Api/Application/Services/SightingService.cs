@@ -40,6 +40,13 @@ namespace Application.Services
             return sighting;
         }
 
+        public Sighting? GetById(Guid id)
+        {
+            Sighting? sighting = _sightingRepository.GetById(id);
+
+            return sighting;
+        }
+
         public Sighting Update(Sighting sighting, bool withSaveChanges = true)
         {
             Sighting? existingSighting = _sightingRepository.GetById(sighting.Id);
@@ -82,6 +89,12 @@ namespace Application.Services
         public IEnumerable<Sighting> Update(IEnumerable<Sighting> sightings, bool withSaveChanges = true)
         {
             return sightings.Select(sighting => Update(sighting, withSaveChanges)).ToList();
+        }
+
+        public void Remove(Sighting sighting)
+        {
+            _sightingRepository.Remove(sighting);
+            SaveChanges();
         }
     }
 }

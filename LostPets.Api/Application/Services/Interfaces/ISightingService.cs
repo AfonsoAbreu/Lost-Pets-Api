@@ -10,5 +10,7 @@ namespace Application.Services.Interfaces
         IEnumerable<Sighting> Add(IEnumerable<Sighting> sightings, bool withSaveChanges = true);
         Sighting Update(Sighting sighting, bool withSaveChanges = true);
         IEnumerable<Sighting> Update(IEnumerable<Sighting> sightings, bool withSaveChanges = true);
+        Sighting? GetById(Guid id);
+        void Remove(Sighting sighting);
     }
 }

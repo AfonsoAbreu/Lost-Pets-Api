@@ -10,5 +10,7 @@ namespace Application.Services.Interfaces
         IEnumerable<Comment> Add(IEnumerable<Comment> comments, bool withSaveChanges = true);
         Comment Update(Comment comment, bool withSaveChanges = true);
         IEnumerable<Comment> Update(IEnumerable<Comment> comments, bool withSaveChanges = true);
+        void Remove(Comment comment);
+        Comment? GetById(Guid id);
     }
 }

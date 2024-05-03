@@ -6,7 +6,7 @@ namespace Infrastructure.Data.Entities
     {
         public required string Content { get; set; }
 
-        public Guid MissingPetId { get; set; }
+        public Guid? MissingPetId { get; set; }
         public required MissingPet MissingPet { get; set; }
 
         public Guid UserId { get; set; }

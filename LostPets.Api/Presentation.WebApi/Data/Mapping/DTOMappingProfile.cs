@@ -2,6 +2,7 @@
 using Infrastructure.Data.Entities;
 using NetTopologySuite.Geometries;
 using Presentation.WebApi.Data.DTOs;
+using Presentation.WebApi.Data.DTOs.Variations;
 using Presentation.WebApi.Data.Mapping.TypeConverters;
 
 namespace Presentation.WebApi.Data.Mapping
@@ -24,6 +25,8 @@ namespace Presentation.WebApi.Data.Mapping
             CreateMap<MissingPetDTO, MissingPet>();
             CreateMap<PetDTO, Pet>();
             CreateMap<SightingDTO, Sighting>();
+            CreateMap<SightingDTOWithRequiredMissingPetId, Sighting>();
+            CreateMap<CommentDTOWithRequiredMissingPetId, Comment>();
 
             #endregion
 
@@ -35,6 +38,8 @@ namespace Presentation.WebApi.Data.Mapping
             CreateMap<MissingPet, MissingPetDTO>();
             CreateMap<Pet, PetDTO>();
             CreateMap<Sighting, SightingDTO>();
+            CreateMap<Sighting, SightingDTOWithRequiredMissingPetId>();
+            CreateMap<Comment, CommentDTOWithRequiredMissingPetId>();
 
             #endregion
 
