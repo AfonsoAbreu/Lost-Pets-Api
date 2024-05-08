@@ -53,8 +53,8 @@ namespace Presentation.WebApi.Controllers
                 return NotFound();
             }
 
-            User? user = await GetCurrentUser();
-            if (user?.Id != sighting.UserId)
+            bool isNotOwnedByCurrentUser = !(await AreUserIdsFromCurrentUser(sighting.UserId));
+            if (isNotOwnedByCurrentUser)
             {
                 return Forbid();
             }

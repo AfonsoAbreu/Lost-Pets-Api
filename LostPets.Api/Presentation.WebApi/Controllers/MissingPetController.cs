@@ -153,8 +153,8 @@ namespace Presentation.WebApi.Controllers
                 return NotFound();
             }
 
-            User? user = await GetCurrentUser();
-            if (user?.Id != missingPet.UserId)
+            bool isNotOwnedByCurrentUser = !(await AreUserIdsFromCurrentUser(missingPet.UserId));
+            if (isNotOwnedByCurrentUser)
             {
                 return Forbid();
             }
@@ -174,8 +174,8 @@ namespace Presentation.WebApi.Controllers
                 return NotFound();
             }
 
-            User? user = await GetCurrentUser();
-            if (user?.Id != missingPet.UserId)
+            bool isNotOwnedByCurrentUser = !(await AreUserIdsFromCurrentUser(missingPet.UserId));
+            if (isNotOwnedByCurrentUser)
             {
                 return Forbid();
             }

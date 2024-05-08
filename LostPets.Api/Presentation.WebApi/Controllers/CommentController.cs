@@ -59,8 +59,8 @@ namespace Presentation.WebApi.Controllers
                 return NotFound();
             }
 
-            User? user = await GetCurrentUser();
-            if (user?.Id != comment.UserId)
+            bool isNotOwnedByCurrentUser = !(await AreUserIdsFromCurrentUser(comment.UserId));
+            if (isNotOwnedByCurrentUser)
             {
                 return Forbid();
             }
