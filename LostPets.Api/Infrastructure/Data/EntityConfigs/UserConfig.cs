@@ -11,6 +11,10 @@ namespace Infrastructure.Data.EntityConfigs
             builder
                 .Property(e => e.CreatedAt)
                 .HasDefaultValueSql("getdate()");
+
+            builder
+                .Navigation(e => e.Contacts)
+                .AutoInclude();
         }
     }
 }

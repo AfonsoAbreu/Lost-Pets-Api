@@ -10,5 +10,6 @@ namespace Presentation.WebApi.Data.DTOs.Variations
         public ICollection<SightingDTO>? sightings { get; set; }
         public ICollection<CommentDTO>? comments { get; set; }
         public ICollection<MissingPetDTO>? missingPets { get; set; }
+        public ICollection<ContactDTO>? contacts { get; set; }
     }
 }
