@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Identity;
 using Infrastructure.Data.Entities;
 using Presentation.WebApi.Controllers.Base;
 using AutoMapper;
-using NetTopologySuite.Geometries;
 using Application.Exceptions;
 using Presentation.WebApi.Data.DTOs.Variations;
 
@@ -31,12 +30,17 @@ namespace Presentation.WebApi.Controllers
         [ProducesResponseType(typeof(CommentDTO), StatusCodes.Status201Created)]
         public async Task<ActionResult<CommentDTO>> Add([FromBody] CommentDTOWithRequiredMissingPetId commentDto)
         {
-            User? user = await GetCurrentUser();
-            UserDTO userDTO = _mapper.Map<UserDTO>(user);
-
-            commentDto.user = userDTO;
-
             Comment comment = _mapper.Map<Comment>(commentDto);
+
+            User? user = await GetCurrentUser();
+
+            if (user == null)
+            {
+                return Forbid();
+            }
+
+            comment.User = user;
+            comment.UserId = user.Id;
 
             _commentService.Add(comment);
 
@@ -69,13 +73,12 @@ namespace Presentation.WebApi.Controllers
         [HttpPut("{id}"), Authorize]
         public async Task<ActionResult<CommentDTO>> Edit([FromRoute] Guid id, [FromBody] CommentDTO commentDto)
         {
-            User? user = await GetCurrentUser();
-            UserDTO userDTO = _mapper.Map<UserDTO>(user);
-
             commentDto.id = id;
-            commentDto.user = userDTO;
 
             Comment receivedComment = _mapper.Map<Comment>(commentDto);
+
+            User? user = await GetCurrentUser();
+            receivedComment.User = user;
 
             try
             {

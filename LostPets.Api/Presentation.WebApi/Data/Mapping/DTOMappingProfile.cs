@@ -29,6 +29,7 @@ namespace Presentation.WebApi.Data.Mapping
             CreateMap<SightingDTOWithRequiredMissingPetId, Sighting>();
             CreateMap<CommentDTOWithRequiredMissingPetId, Comment>();
             CreateMap<UserDTO, User>();
+            CreateMap<UserProfileDTO, User>();
 
             #endregion
 
@@ -44,6 +45,7 @@ namespace Presentation.WebApi.Data.Mapping
             CreateMap<Sighting, SightingDTOWithRequiredMissingPetId>();
             CreateMap<Comment, CommentDTOWithRequiredMissingPetId>();
             CreateMap<User, UserDTO>();
+            CreateMap<User, UserProfileDTO>();
 
             #endregion
 

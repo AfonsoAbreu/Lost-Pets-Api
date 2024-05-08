@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 
 namespace Infrastructure.Repositories.Base
 {
-    public interface IBaseRepository<T> where T : class
+    public interface IBaseRepository<T> where T : IBaseEntity
     {
         T? GetById(Guid id);
         IEnumerable<T> GetAll();

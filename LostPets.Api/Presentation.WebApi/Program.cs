@@ -98,6 +98,7 @@ builder.Services.AddScoped<IPetRepository, PetRepository>();
 builder.Services.AddScoped<IMissingPetRepository, MissingPetRepository>();
 builder.Services.AddScoped<ISightingRepository, SightingRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 #endregion
 
@@ -107,6 +108,7 @@ builder.Services.AddScoped<IMissingPetService, MissingPetService>();
 builder.Services.AddScoped<IPetService, PetService>();
 builder.Services.AddScoped<ISightingService, SightingService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 #endregion
 

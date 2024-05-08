@@ -1,4 +1,5 @@
 ﻿using Infrastructure.Data;
+using Infrastructure.Data.Entities.Base;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Query;
@@ -6,7 +7,7 @@ using System.Linq.Expressions;
 
 namespace Infrastructure.Repositories.Base
 {
-    public abstract class BaseRepository<T>(ApplicationDbContext context) : IBaseRepository<T> where T : class
+    public abstract class BaseRepository<T>(ApplicationDbContext context) : IBaseRepository<T> where T : class, IBaseEntity
     {
         private readonly ApplicationDbContext _context = context;
 
