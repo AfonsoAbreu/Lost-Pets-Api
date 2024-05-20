@@ -7,6 +7,13 @@ using Infrastructure.Repositories;
 using Application.Services.Interfaces;
 using Application.Services;
 using System.Text.Json.Serialization;
+using Infrastructure.Facades.Settings;
+using Infrastructure.Facades.Interfaces;
+using Infrastructure.Facades;
+using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,11 +72,35 @@ builder.Services.AddSwaggerGen(options =>
 
 #region Identity Service Setup
 
-builder.Services.AddAuthentication()
-    .AddBearerToken(options =>
+#region JWT Settings
+
+var jwtSettings = new JwtFacadeSettings();
+builder.Configuration.Bind(jwtSettings.SectionName, jwtSettings);
+builder.Services.AddSingleton(Options.Create(jwtSettings));
+
+builder.Services.AddSingleton<IJwtFacade, JwtFacade>();
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+    .AddJwtBearer(options =>
     {
-        options.BearerTokenExpiration = TimeSpan.FromDays(1);
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtSettings.Issuer,
+            ValidAudience = jwtSettings.Audience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Secret)),
+        };
     });
+
+#endregion
+
 builder.Services.AddAuthorization();
 
 // Identity Api Endpoints

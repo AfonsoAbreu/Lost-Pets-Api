@@ -1,7 +1,7 @@
-﻿using Application.Facades.Interfaces;
+﻿using Infrastructure.Facades.Interfaces;
 using Microsoft.EntityFrameworkCore.Storage;
 
-namespace Application.Facades
+namespace Infrastructure.Facades
 {
     public class ActiveDbTransactionFacade(IDbContextTransaction dbContextTransaction) : IActiveDbTransactionFacade
     {

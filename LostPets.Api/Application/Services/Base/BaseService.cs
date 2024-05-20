@@ -1,5 +1,5 @@
-﻿using Application.Facades;
-using Application.Facades.Interfaces;
+﻿using Infrastructure.Facades;
+using Infrastructure.Facades.Interfaces;
 using Infrastructure.Data;
 
 namespace Application.Services.Base
