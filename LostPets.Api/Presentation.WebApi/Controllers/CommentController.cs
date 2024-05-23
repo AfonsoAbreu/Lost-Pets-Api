@@ -32,15 +32,14 @@ namespace Presentation.WebApi.Controllers
         {
             Comment comment = _mapper.Map<Comment>(commentDto);
 
-            User? user = await GetCurrentUser();
+            Guid? userId = GetCurrentUserId();
 
-            if (user == null)
+            if (userId == null)
             {
                 return Forbid();
             }
 
-            comment.User = user;
-            comment.UserId = user.Id;
+            comment.UserId = userId.Value;
 
             _commentService.Add(comment);
 
@@ -77,8 +76,14 @@ namespace Presentation.WebApi.Controllers
 
             Comment receivedComment = _mapper.Map<Comment>(commentDto);
 
-            User? user = await GetCurrentUser();
-            receivedComment.User = user;
+            Guid? userId = GetCurrentUserId();
+
+            if (!userId.HasValue) 
+            {
+                return Forbid();
+            }
+
+            receivedComment.UserId = userId.Value;
 
             try
             {

@@ -29,12 +29,16 @@ namespace Presentation.WebApi.Controllers
         [ProducesResponseType(typeof(SightingDTO), StatusCodes.Status201Created)]
         public async Task<ActionResult<SightingDTO>> Add([FromBody] SightingDTOWithRequiredMissingPetId sightingDto)
         {
-            User? user = await GetCurrentUser();
-            UserDTO userDTO = _mapper.Map<UserDTO>(user);
-
-            sightingDto.user = userDTO;
-
             Sighting sighting = _mapper.Map<Sighting>(sightingDto);
+
+            Guid? userId = GetCurrentUserId();
+
+            if (!userId.HasValue)
+            {
+                return Forbid();
+            }
+
+            sighting.UserId = userId.Value;
 
             _sightingService.Add(sighting);
 

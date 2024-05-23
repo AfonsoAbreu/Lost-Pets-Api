@@ -31,15 +31,14 @@ namespace Presentation.WebApi.Controllers
         {
             Contact contact = _mapper.Map<Contact>(contactDto);
 
-            User? user = await GetCurrentUser();
+            Guid? userId = GetCurrentUserId();
 
-            if (user == null)
+            if (!userId.HasValue)
             {
                 return Forbid();
             }
 
-            contact.User = user;
-            contact.UserId = user.Id;
+            contact.UserId = userId.Value;
 
             _contactService.Add(contact);
 
@@ -76,8 +75,14 @@ namespace Presentation.WebApi.Controllers
 
             Contact receivedContact = _mapper.Map<Contact>(contactDto);
 
-            User? user = await GetCurrentUser();
-            receivedContact.User = user;
+            Guid? userId = GetCurrentUserId();
+
+            if (!userId.HasValue)
+            {
+                return Forbid();
+            }
+
+            receivedContact.UserId = userId.Value;
 
             try
             {

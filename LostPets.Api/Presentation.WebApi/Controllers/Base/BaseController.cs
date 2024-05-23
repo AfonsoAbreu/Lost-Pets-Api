@@ -1,6 +1,8 @@
 ﻿using Infrastructure.Data.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace Presentation.WebApi.Controllers.Base
 {
@@ -9,6 +11,25 @@ namespace Presentation.WebApi.Controllers.Base
 
         private readonly UserManager<User> _userManager = userManager;
 
+        protected Guid? GetCurrentUserId()
+        {
+            Claim? jtiClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (jtiClaim == null) 
+            {
+                return null;
+            }
+
+            Guid claimValue;
+
+            if (!Guid.TryParse(jtiClaim.Value, out claimValue)) 
+            {
+                return null;
+            }
+
+            return claimValue;
+        }
+
         protected async Task<User?> GetCurrentUser()
         {
             return await _userManager.GetUserAsync(User);
@@ -16,14 +37,14 @@ namespace Presentation.WebApi.Controllers.Base
 
         protected async Task<bool> AreUserIdsFromCurrentUser(params Guid?[] ids)
         {
-            var user = await GetCurrentUser();
+            Guid? userId = GetCurrentUserId();
 
-            if (user == null)
+            if (!userId.HasValue)
             {
                 return false;
             }
 
-            return ids.All(id => user.Id == id);
+            return ids.All(id => userId.Value == id);
         }
 
     }

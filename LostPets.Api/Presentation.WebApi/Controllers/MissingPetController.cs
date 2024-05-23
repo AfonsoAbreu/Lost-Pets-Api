@@ -31,15 +31,19 @@ namespace Presentation.WebApi.Controllers
         [ProducesResponseType(typeof(MissingPetDTO), StatusCodes.Status201Created)]
         public async Task<ActionResult<MissingPetDTO>> Add([FromBody] MissingPetDTO missingPetDto)
         {
-            User? user = await GetCurrentUser();
-            UserDTO userDTO = _mapper.Map<UserDTO>(user);
-
-            missingPetDto.user = userDTO;
-            missingPetDto.sightings
-                ?.ToList()
-                .ForEach(s => s.user = userDTO);
-
             MissingPet missingPet = _mapper.Map<MissingPet>(missingPetDto);
+
+            Guid? userId = GetCurrentUserId();
+
+            if (!userId.HasValue) 
+            {
+                return Forbid();
+            }
+
+            missingPet.UserId = userId.Value;
+            missingPet.Sightings
+                ?.ToList()
+                .ForEach(s => s.UserId = userId.Value);
 
             try
             {
@@ -94,32 +98,40 @@ namespace Presentation.WebApi.Controllers
         }
 
         [HttpPut("{id}"), Authorize]
-        public async Task<ActionResult<MissingPetDTO>> Edit([FromRoute] Guid id, [FromBody] MissingPetDTOWithOptionalSightings missingPetDTO)
+        public ActionResult<MissingPetDTO> Edit([FromRoute] Guid id, [FromBody] MissingPetDTOWithOptionalSightings missingPetDTO)
         {
-            User? user = await GetCurrentUser();
-            UserDTO userDTO = _mapper.Map<UserDTO>(user);
-
-            missingPetDTO.id = id;
-            missingPetDTO.user = userDTO;
-
-            foreach (var sighting in missingPetDTO.sightings ?? [])
-            {
-                sighting.missingPetId = id;
-            }
-            foreach (var comment in missingPetDTO.comments ?? [])
-            {
-                comment.missingPetId = id;
-                comment.user ??= userDTO;
-            }
-
-            missingPetDTO.sightings = missingPetDTO.sightings
-                ?.Where(sighting => sighting.user == userDTO)
-                .ToList();
-            missingPetDTO.comments = missingPetDTO.comments
-                ?.Where(comment => comment.user == userDTO)
-                .ToList();
-
             MissingPet receivedMissingPet = _mapper.Map<MissingPet>(missingPetDTO);
+
+            Guid? userId = GetCurrentUserId();
+
+            if (!userId.HasValue)
+            {
+                return Forbid();
+            }
+
+            receivedMissingPet.Id = id;
+            receivedMissingPet.UserId = userId.Value;
+
+            foreach (var sighting in receivedMissingPet.Sightings)
+            {
+                sighting.MissingPetId = id;
+            }
+            foreach (var comment in receivedMissingPet.Comments ?? [])
+            {
+                comment.MissingPetId = id;
+
+                if (comment.UserId == Guid.Empty)
+                {
+                    comment.UserId = userId.Value;
+                }
+            }
+
+            receivedMissingPet.Sightings = receivedMissingPet.Sightings
+                .Where(sighting => sighting.UserId == userId.Value)
+                .ToList();
+            receivedMissingPet.Comments = receivedMissingPet.Comments
+                ?.Where(comment => comment.UserId == userId.Value)
+                .ToList();
 
             try
             {
