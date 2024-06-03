@@ -108,5 +108,27 @@ namespace Infrastructure.Repositories.Base
         {
             _context.Attach(entity);
         }
+
+        public bool IsAttached(T entity)
+        {
+            var entry = GetEntry(entity);
+            return entry.State != EntityState.Detached;
+        }
+
+        public void Detach(IEnumerable<T> entities)
+        {
+            foreach (var entity in entities)
+            {
+                Detach(entity);
+            }
+        }
+
+        public void Attach(IEnumerable<T> entities)
+        {
+            foreach (var entity in entities)
+            {
+                Attach(entity);
+            }
+        }
     }
 }

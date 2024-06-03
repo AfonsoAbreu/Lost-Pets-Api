@@ -12,5 +12,6 @@ namespace Application.Services.Interfaces
         IEnumerable<Comment> Update(IEnumerable<Comment> comments, bool withSaveChanges = true);
         void Remove(Comment comment);
         Comment? GetById(Guid id);
+        IEnumerable<Comment> FilterByRootLevelComments(ICollection<Comment> comments);
     }
 }

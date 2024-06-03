@@ -53,8 +53,6 @@ namespace Application.Services
             {
                 _missingPetRepository.ExplicitLoadCollection(missingPet, entity => entity.Sightings);
                 _missingPetRepository.ExplicitLoadCollection(missingPet, entity => entity.Comments);
-
-                missingPet.Comments = FilterByRootLevelComments(missingPet.Comments);
             }
 
             return missingPet;
@@ -63,19 +61,17 @@ namespace Application.Services
         public IEnumerable<MissingPet> SearchBylocationAndRadius(Point location, double radius, int page = 1, int itemsPerPage = 10)
         {
             IEnumerable<MissingPet> missingPets = _missingPetRepository.SearchBylocationAndRadius(location, radius, page, itemsPerPage);
+            _missingPetRepository.Detach(missingPets);
 
             foreach (MissingPet missingPet in missingPets)
             {
-                missingPet.Comments = FilterByRootLevelComments(missingPet.Comments);
+                if (missingPet.Comments != null)
+                {
+                    missingPet.Comments = _commentService.FilterByRootLevelComments(missingPet.Comments).ToList();
+                }
+
                 yield return missingPet;
             }
-        }
-
-        private static List<Comment>? FilterByRootLevelComments(ICollection<Comment>? comments)
-        {
-            return comments
-                ?.Where(comment => comment.AwnsersTo == null)
-                .ToList();
         }
 
         public MissingPet Update(MissingPet missingPet)
@@ -92,19 +88,27 @@ namespace Application.Services
             }
 
             existingMissingPet.Status = missingPet.Status;
+
+            missingPet.Pet.Id = existingMissingPet.PetId;
+
             existingMissingPet.Pet = _petService.Update(missingPet.Pet, false);
 
             if (missingPet.Sightings.Count != 0)
             {
-                existingMissingPet.Sightings = _sightingService.AddOrUpdate(missingPet.Sightings, false).ToList();
+                existingMissingPet.Sightings = existingMissingPet.Sightings.Union(_sightingService.AddOrUpdate(missingPet.Sightings, false)).ToList();
             }
 
             if (missingPet.Comments != null && missingPet.Comments.Count != 0)
             {
-                existingMissingPet.Comments = _commentService.AddOrUpdate(missingPet.Comments, false).ToList();
+                existingMissingPet.Comments = existingMissingPet.Comments?.Union(_commentService.AddOrUpdate(missingPet.Comments, false))?.ToList();
             }
             
             SaveChanges();
+
+            if (existingMissingPet.Comments != null)
+            {
+                existingMissingPet.Comments = _commentService.FilterByRootLevelComments(existingMissingPet.Comments).ToList();
+            }
 
             return existingMissingPet;
         }

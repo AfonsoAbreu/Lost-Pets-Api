@@ -20,6 +20,9 @@ namespace Infrastructure.Repositories.Base
         void ExplicitLoadCollection<TProperty>(T entity, Expression<Func<T, IEnumerable<TProperty>>> propertyExpression) where TProperty : class;
         void ExplicitLoadReference<TProperty>(T entity, Expression<Func<T, TProperty?>> propertyExpression) where TProperty : class;
         void Detach(T entity);
+        void Detach(IEnumerable<T> entities);
         void Attach(T entity);
+        void Attach(IEnumerable<T> entities);
+        bool IsAttached(T entity);
     }
 }

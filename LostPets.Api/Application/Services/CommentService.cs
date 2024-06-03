@@ -100,5 +100,10 @@ namespace Application.Services
             _commentRepository.Remove(comment);
             SaveChanges();
         }
+
+        public IEnumerable<Comment> FilterByRootLevelComments(ICollection<Comment> comments)
+        {
+            return comments.Where(comment => comment.AwnsersTo == null);
+        }
     }
 }

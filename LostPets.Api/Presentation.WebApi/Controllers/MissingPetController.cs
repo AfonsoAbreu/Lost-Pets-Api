@@ -115,6 +115,11 @@ namespace Presentation.WebApi.Controllers
             foreach (var sighting in receivedMissingPet.Sightings)
             {
                 sighting.MissingPetId = id;
+
+                if (sighting.UserId == Guid.Empty)
+                {
+                    sighting.UserId = userId.Value;
+                }
             }
             foreach (var comment in receivedMissingPet.Comments ?? [])
             {
