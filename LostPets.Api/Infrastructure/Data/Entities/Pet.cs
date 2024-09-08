@@ -6,7 +6,7 @@ namespace Infrastructure.Data.Entities
     {
         public required string Name { get; set; }
         public required string Species { get; set; }
-        public int? Age { get; set; }
+        public string? Age { get; set; }
         public string? Description { get; set; }
 
         public required MissingPet MissingPet { get; set; }

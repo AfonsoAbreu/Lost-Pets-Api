@@ -10,7 +10,7 @@ namespace Presentation.WebApi.Data.DTOs
         [Required]
         public string? species { get; set; }
         [Required, Range(0, int.MaxValue)]
-        public int? age { get; set; }
+        public string? age { get; set; }
         //public ICollection<PhotoDTO> photos { get; set; }
         public string? description { get; set; }
     }
