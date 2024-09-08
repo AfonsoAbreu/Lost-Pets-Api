@@ -29,7 +29,7 @@ namespace Presentation.WebApi.Controllers
 
         [HttpPost, Authorize]
         [ProducesResponseType(typeof(MissingPetDTO), StatusCodes.Status201Created)]
-        public async Task<ActionResult<MissingPetDTO>> Add([FromBody] MissingPetDTO missingPetDto)
+        public ActionResult<MissingPetDTO> Add([FromBody] MissingPetDTO missingPetDto)
         {
             MissingPet missingPet = _mapper.Map<MissingPet>(missingPetDto);
 
@@ -161,7 +161,7 @@ namespace Presentation.WebApi.Controllers
         }
 
         [HttpDelete("{id}"), Authorize]
-        public async Task<IActionResult> Remove([FromRoute] Guid id)
+        public IActionResult Remove([FromRoute] Guid id)
         {
             MissingPet? missingPet = _missingPetService.GetById(id);
 
@@ -170,7 +170,7 @@ namespace Presentation.WebApi.Controllers
                 return NotFound();
             }
 
-            bool isNotOwnedByCurrentUser = !(await AreUserIdsFromCurrentUser(missingPet.UserId));
+            bool isNotOwnedByCurrentUser = !AreUserIdsFromCurrentUser(missingPet.UserId);
             if (isNotOwnedByCurrentUser)
             {
                 return Forbid();
@@ -182,7 +182,7 @@ namespace Presentation.WebApi.Controllers
         }
 
         [HttpDelete("{id}/deactivate"), Authorize]
-        public async Task<IActionResult> Deactivate([FromRoute] Guid id)
+        public IActionResult Deactivate([FromRoute] Guid id)
         {
             MissingPet? missingPet = _missingPetService.GetById(id);
 
@@ -191,7 +191,7 @@ namespace Presentation.WebApi.Controllers
                 return NotFound();
             }
 
-            bool isNotOwnedByCurrentUser = !(await AreUserIdsFromCurrentUser(missingPet.UserId));
+            bool isNotOwnedByCurrentUser = !AreUserIdsFromCurrentUser(missingPet.UserId);
             if (isNotOwnedByCurrentUser)
             {
                 return Forbid();

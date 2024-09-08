@@ -28,7 +28,7 @@ namespace Presentation.WebApi.Controllers
 
         [HttpPost, Authorize]
         [ProducesResponseType(typeof(CommentDTO), StatusCodes.Status201Created)]
-        public async Task<ActionResult<CommentDTO>> Add([FromBody] CommentDTOWithRequiredMissingPetId commentDto)
+        public ActionResult<CommentDTO> Add([FromBody] CommentDTOWithRequiredMissingPetId commentDto)
         {
             Comment comment = _mapper.Map<Comment>(commentDto);
 
@@ -49,7 +49,7 @@ namespace Presentation.WebApi.Controllers
         }
 
         [HttpDelete("{id}"), Authorize]
-        public async Task<IActionResult> Remove([FromRoute] Guid id)
+        public IActionResult Remove([FromRoute] Guid id)
         {
             Comment? comment = _commentService.GetById(id);
 
@@ -58,7 +58,7 @@ namespace Presentation.WebApi.Controllers
                 return NotFound();
             }
 
-            bool isNotOwnedByCurrentUser = !(await AreUserIdsFromCurrentUser(comment.UserId));
+            bool isNotOwnedByCurrentUser = !AreUserIdsFromCurrentUser(comment.UserId);
             if (isNotOwnedByCurrentUser)
             {
                 return Forbid();
@@ -70,7 +70,7 @@ namespace Presentation.WebApi.Controllers
         }
 
         [HttpPut("{id}"), Authorize]
-        public async Task<ActionResult<CommentDTO>> Edit([FromRoute] Guid id, [FromBody] CommentDTO commentDto)
+        public ActionResult<CommentDTO> Edit([FromRoute] Guid id, [FromBody] CommentDTO commentDto)
         {
             commentDto.id = id;
 

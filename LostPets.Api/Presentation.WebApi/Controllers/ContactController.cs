@@ -27,7 +27,7 @@ namespace Presentation.WebApi.Controllers
 
         [HttpPost, Authorize]
         [ProducesResponseType(typeof(ContactDTO), StatusCodes.Status201Created)]
-        public async Task<ActionResult<ContactDTO>> Add([FromBody] ContactDTO contactDto)
+        public ActionResult<ContactDTO> Add([FromBody] ContactDTO contactDto)
         {
             Contact contact = _mapper.Map<Contact>(contactDto);
 
@@ -48,7 +48,7 @@ namespace Presentation.WebApi.Controllers
         }
 
         [HttpDelete("{id}"), Authorize]
-        public async Task<IActionResult> Remove([FromRoute] Guid id)
+        public IActionResult Remove([FromRoute] Guid id)
         {
             Contact? contact = _contactService.GetById(id);
 
@@ -57,7 +57,7 @@ namespace Presentation.WebApi.Controllers
                 return NotFound();
             }
 
-            bool isNotOwnedByCurrentUser = !(await AreUserIdsFromCurrentUser(contact.UserId));
+            bool isNotOwnedByCurrentUser = !AreUserIdsFromCurrentUser(contact.UserId);
             if (isNotOwnedByCurrentUser)
             {
                 return Forbid();
@@ -69,7 +69,7 @@ namespace Presentation.WebApi.Controllers
         }
 
         [HttpPut("{id}"), Authorize]
-        public async Task<ActionResult<ContactDTO>> Edit([FromRoute] Guid id, [FromBody] ContactDTO contactDto)
+        public ActionResult<ContactDTO> Edit([FromRoute] Guid id, [FromBody] ContactDTO contactDto)
         {
             contactDto.id = id;
 

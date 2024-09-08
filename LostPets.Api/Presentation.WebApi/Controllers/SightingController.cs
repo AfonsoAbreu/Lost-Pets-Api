@@ -27,7 +27,7 @@ namespace Presentation.WebApi.Controllers
 
         [HttpPost, Authorize]
         [ProducesResponseType(typeof(SightingDTO), StatusCodes.Status201Created)]
-        public async Task<ActionResult<SightingDTO>> Add([FromBody] SightingDTOWithRequiredMissingPetId sightingDto)
+        public ActionResult<SightingDTO> Add([FromBody] SightingDTOWithRequiredMissingPetId sightingDto)
         {
             Sighting sighting = _mapper.Map<Sighting>(sightingDto);
 
@@ -48,7 +48,7 @@ namespace Presentation.WebApi.Controllers
         }
 
         [HttpDelete("{id}"), Authorize]
-        public async Task<IActionResult> Remove([FromRoute] Guid id)
+        public IActionResult Remove([FromRoute] Guid id)
         {
             Sighting? sighting = _sightingService.GetById(id);
 
@@ -57,7 +57,7 @@ namespace Presentation.WebApi.Controllers
                 return NotFound();
             }
 
-            bool isNotOwnedByCurrentUser = !(await AreUserIdsFromCurrentUser(sighting.UserId));
+            bool isNotOwnedByCurrentUser = !AreUserIdsFromCurrentUser(sighting.UserId);
             if (isNotOwnedByCurrentUser)
             {
                 return Forbid();

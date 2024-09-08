@@ -30,9 +30,9 @@ namespace Presentation.WebApi.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<UserProfileDTO>> GetById([FromRoute] Guid id)
+        public ActionResult<UserProfileDTO> GetById([FromRoute] Guid id)
         {
-            bool isCurrentUser = await AreUserIdsFromCurrentUser(id);
+            bool isCurrentUser = AreUserIdsFromCurrentUser(id);
             User? user = _userService.GetById(id, isCurrentUser);
 
             if (user == null)

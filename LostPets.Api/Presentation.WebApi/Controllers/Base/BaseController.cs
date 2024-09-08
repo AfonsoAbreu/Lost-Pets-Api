@@ -35,7 +35,7 @@ namespace Presentation.WebApi.Controllers.Base
             return await _userManager.GetUserAsync(User);
         }
 
-        protected async Task<bool> AreUserIdsFromCurrentUser(params Guid?[] ids)
+        protected bool AreUserIdsFromCurrentUser(params Guid?[] ids)
         {
             Guid? userId = GetCurrentUserId();
 
