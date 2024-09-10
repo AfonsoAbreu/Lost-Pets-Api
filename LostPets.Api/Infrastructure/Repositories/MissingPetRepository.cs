@@ -14,7 +14,7 @@ namespace Infrastructure.Repositories
 
         }
 
-        public IEnumerable<MissingPet> SearchBylocationAndRadius(Point location, double radius, int page = 1, int itemsPerPage = 10)
+        public List<MissingPet> SearchBylocationAndRadius(Point location, double radius, int page = 1, int itemsPerPage = 10)
         {
             return GetSet()
                 .Where(missingPet =>

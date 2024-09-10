@@ -6,6 +6,6 @@ namespace Infrastructure.Repositories.Interfaces
 {
     public interface IMissingPetRepository : IBaseRepository<MissingPet>
     {
-        IEnumerable<MissingPet> SearchBylocationAndRadius(Point location, double radius, int page = 1, int itemsPerPage = 10);
+        List<MissingPet> SearchBylocationAndRadius(Point location, double radius, int page = 1, int itemsPerPage = 10);
     }
 }

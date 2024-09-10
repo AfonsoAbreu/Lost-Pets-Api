@@ -60,7 +60,7 @@ namespace Application.Services
 
         public IEnumerable<MissingPet> SearchBylocationAndRadius(Point location, double radius, int page = 1, int itemsPerPage = 10)
         {
-            IEnumerable<MissingPet> missingPets = _missingPetRepository.SearchBylocationAndRadius(location, radius, page, itemsPerPage);
+            List<MissingPet> missingPets = _missingPetRepository.SearchBylocationAndRadius(location, radius, page, itemsPerPage);
             _missingPetRepository.Detach(missingPets);
 
             foreach (MissingPet missingPet in missingPets)
