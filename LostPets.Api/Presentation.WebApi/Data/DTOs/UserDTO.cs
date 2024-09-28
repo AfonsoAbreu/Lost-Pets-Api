@@ -8,6 +8,7 @@ namespace Presentation.WebApi.Data.DTOs
         [Required, EmailAddress]
         public string? email { get; set; }
         public string? userName { get; set; }
+        public ImageDTO? image { get; set; }
         public ICollection<ContactDTO>? contacts { get; set; }
     }
 }

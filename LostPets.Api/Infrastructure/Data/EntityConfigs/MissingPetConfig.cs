@@ -26,11 +26,20 @@ namespace Infrastructure.Data.EntityConfigs
                 .OnDelete(DeleteBehavior.ClientNoAction);
 
             builder
+                .HasMany(e => e.Images)
+                .WithMany(e => e.MissingPets)
+                .UsingEntity<MissingPetImage>();
+
+            builder
                 .Navigation(e => e.Pet)
                 .AutoInclude();
 
+            //builder
+            //    .Navigation(e => e.User)
+            //    .AutoInclude();
+
             builder
-                .Navigation(e => e.User)
+                .Navigation(e => e.Images)
                 .AutoInclude();
         }
     }

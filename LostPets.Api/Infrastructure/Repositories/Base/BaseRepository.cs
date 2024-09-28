@@ -26,96 +26,110 @@ namespace Infrastructure.Repositories.Base
             return _context.Entry(entity);
         }
 
-        public void Add(T entity)
+        public virtual void Add(T entity)
         {
             GetSet().Add(entity);
         }
 
-        public void AddRange(IEnumerable<T> entities)
+        public virtual void AddRange(IEnumerable<T> entities)
         {
             GetSet().AddRange(entities);
         }
 
-        public IEnumerable<T> Find(Expression<Func<T, bool>> expression)
+        public virtual IEnumerable<T> Find(Expression<Func<T, bool>> expression)
         {
             return GetSet().Where(expression);
         }
 
-        public IEnumerable<T> GetAll()
+        public virtual IEnumerable<T> GetAll()
         {
             return GetSet().AsEnumerable();
         }
 
-        public T? GetById(Guid id)
+        public virtual T? GetById(Guid id)
         {
             return GetSet().Find(id);
         }
 
-        public void Remove(T entity)
+        public virtual void Remove(T entity)
         {
             GetSet().Remove(entity);
         }
 
-        public void RemoveRange(IEnumerable<T> entities)
+        public virtual void RemoveRange(IEnumerable<T> entities)
         {
             GetSet().RemoveRange(entities);
         }
 
-        public void Update(T entity)
+        public virtual void Update(T entity)
         {
             GetSet().Update(entity);
         }
 
-        public void UpdateRange(IEnumerable<T> entities)
+        public virtual void UpdateRange(IEnumerable<T> entities)
         {
             GetSet().UpdateRange(entities);
         }
 
-        public int RemoveWhere(Expression<Func<T, bool>> where)
+        public virtual int RemoveWhere(Expression<Func<T, bool>> where)
         {
             return GetSet()
                 .Where(where)
                 .ExecuteDelete();
         }
 
-        public int UpdateWhere(Expression<Func<T, bool>> where, Expression<Func<SetPropertyCalls<T>, SetPropertyCalls<T>>> set)
+        public virtual int UpdateWhere(Expression<Func<T, bool>> where, Expression<Func<SetPropertyCalls<T>, SetPropertyCalls<T>>> set)
         {
             return GetSet()
                 .Where(where)
                 .ExecuteUpdate(set);
         }
 
-        public void ExplicitLoadCollection<TProperty>(T entity, Expression<Func<T, IEnumerable<TProperty>>> propertyExpression) where TProperty : class
+        public virtual void ExplicitLoadCollection<TProperty>(T entity, Expression<Func<T, IEnumerable<TProperty>>> propertyExpression, Func<IQueryable<TProperty>, IQueryable<TProperty>>? queryExpression = null) where TProperty : class
         {
-            GetEntry(entity)
+            var query = GetEntry(entity)
                 .Collection(propertyExpression)
-                .Load();
+                .Query();
+
+            if (queryExpression != null)
+            {
+                query = queryExpression(query);
+            }
+
+            query.Load();
         }
 
-        public void ExplicitLoadReference<TProperty>(T entity, Expression<Func<T, TProperty?>> propertyExpression) where TProperty : class
+        public virtual void ExplicitLoadReference<TProperty>(T entity, Expression<Func<T, TProperty?>> propertyExpression, Func<IQueryable<TProperty>, IQueryable<TProperty>>? queryExpression = null) where TProperty : class
         {
-            GetEntry(entity)
+            var query = GetEntry(entity)
                 .Reference(propertyExpression)
-                .Load();
+                .Query();
+
+            if (queryExpression != null)
+            {
+                query = queryExpression(query);
+            }
+
+            query.Load();
         }
 
-        public void Detach(T entity)
+        public virtual void Detach(T entity)
         {
             GetEntry(entity).State = EntityState.Detached;
         }
 
-        public void Attach(T entity)
+        public virtual void Attach(T entity)
         {
             _context.Attach(entity);
         }
 
-        public bool IsAttached(T entity)
+        public virtual bool IsAttached(T entity)
         {
             var entry = GetEntry(entity);
             return entry.State != EntityState.Detached;
         }
 
-        public void Detach(IEnumerable<T> entities)
+        public virtual void Detach(IEnumerable<T> entities)
         {
             foreach (var entity in entities)
             {
@@ -123,7 +137,7 @@ namespace Infrastructure.Repositories.Base
             }
         }
 
-        public void Attach(IEnumerable<T> entities)
+        public virtual void Attach(IEnumerable<T> entities)
         {
             foreach (var entity in entities)
             {

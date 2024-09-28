@@ -11,5 +11,8 @@ namespace Infrastructure.Data.Entities
         public ICollection<Contact>? Contacts { get; set; }
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
+
+        public Guid? ImageId { get; set; }
+        public Image? Image { get; set; }
     }
 }

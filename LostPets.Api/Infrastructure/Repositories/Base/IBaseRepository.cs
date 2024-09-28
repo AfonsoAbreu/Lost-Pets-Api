@@ -17,8 +17,8 @@ namespace Infrastructure.Repositories.Base
         void UpdateRange(IEnumerable<T> entities);
         int RemoveWhere(Expression<Func<T, bool>> where);
         int UpdateWhere(Expression<Func<T, bool>> where, Expression<Func<SetPropertyCalls<T>, SetPropertyCalls<T>>> set);
-        void ExplicitLoadCollection<TProperty>(T entity, Expression<Func<T, IEnumerable<TProperty>>> propertyExpression) where TProperty : class;
-        void ExplicitLoadReference<TProperty>(T entity, Expression<Func<T, TProperty?>> propertyExpression) where TProperty : class;
+        void ExplicitLoadCollection<TProperty>(T entity, Expression<Func<T, IEnumerable<TProperty>>> propertyExpression, Func<IQueryable<TProperty>, IQueryable<TProperty>>? queryExpression = null) where TProperty : class;
+        void ExplicitLoadReference<TProperty>(T entity, Expression<Func<T, TProperty?>> propertyExpression, Func<IQueryable<TProperty>, IQueryable<TProperty>>? queryExpression = null) where TProperty : class;
         void Detach(T entity);
         void Detach(IEnumerable<T> entities);
         void Attach(T entity);

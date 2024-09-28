@@ -15,6 +15,13 @@ namespace Infrastructure.Data.EntityConfigs
             builder
                 .Navigation(e => e.Contacts)
                 .AutoInclude();
+
+            builder
+                .HasOne(e => e.Image)
+                .WithOne(e => e.User)
+                .HasForeignKey<User>(e => e.ImageId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

@@ -20,6 +20,8 @@ namespace Infrastructure.Data.Entities
         public required Pet Pet { get; set; }
 
         public required ICollection<Sighting> Sightings { get; set; }
+        public ICollection<Image>? Images { get; set; }
+        public ICollection<MissingPetImage>? MissingPetImages { get; set; }
         public ICollection<Comment>? Comments { get; set; }
     }
 }

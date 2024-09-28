@@ -25,9 +25,9 @@ namespace Infrastructure.Data.EntityConfigs
                 .IsRequired()
                 .OnDelete(DeleteBehavior.ClientNoAction);
 
-            builder
-                .Navigation(e => e.User)
-                .AutoInclude();
+            //builder
+            //    .Navigation(e => e.User)
+            //    .AutoInclude();
         }
     }
 }

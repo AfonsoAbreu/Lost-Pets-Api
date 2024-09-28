@@ -35,6 +35,8 @@ namespace Infrastructure.Data
             new MissingPetConfig().Configure(builder.Entity<MissingPet>());
             new CommentConfig().Configure(builder.Entity<Comment>());
             new SightingConfig().Configure(builder.Entity<Sighting>());
+            new ImageConfig().Configure(builder.Entity<Image>());
+            new MissingPetImageConfig().Configure(builder.Entity<MissingPetImage>());
             #endregion
         }
 
@@ -68,17 +70,18 @@ namespace Infrastructure.Data
 
         private void AddTimestamps()
         {
-            var entries =
+            var entities =
                 from entry in ChangeTracker.Entries()
-                where entry.Entity is IBaseEntity
+                let entity = entry.Entity
+                where entity is IBaseEntity
                     && entry.State == EntityState.Modified
-                select entry;
+                select entity;
 
-            foreach (var entry in entries)
+            foreach (var entity in entities)
             {
                 DateTime now = DateTime.UtcNow;
 
-                ((IBaseEntity)entry.Entity).UpdatedAt = now;
+                ((IBaseEntity)entity).UpdatedAt = now;
             }
         }
 
