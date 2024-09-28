@@ -10,7 +10,6 @@ using NetTopologySuite.Geometries;
 using Application.Exceptions;
 using Presentation.WebApi.Data.DTOs.Variations;
 using Infrastructure.Exceptions;
-using Microsoft.IdentityModel.Tokens;
 
 
 namespace Presentation.WebApi.Controllers
