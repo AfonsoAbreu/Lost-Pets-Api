@@ -31,6 +31,7 @@ namespace Presentation.WebApi.Data.Mapping
             CreateMap<UserDTO, User>();
             CreateMap<UserProfileDTO, User>();
             CreateMap<ContactDTO, Contact>();
+            CreateMap<ImageDTO, Image>();
 
             #endregion
 
@@ -48,6 +49,7 @@ namespace Presentation.WebApi.Data.Mapping
             CreateMap<User, UserDTO>();
             CreateMap<User, UserProfileDTO>();
             CreateMap<Contact, ContactDTO>();
+            CreateMap<Image, ImageDTO>();
 
             #endregion
 

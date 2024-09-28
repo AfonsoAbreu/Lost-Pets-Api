@@ -4,8 +4,18 @@ namespace Infrastructure.Data.Entities
 {
     public class Image : BaseEntity
     {
-        public required string Location { get; set; }
+        public string? Location { get; set; }
+        public required string Url { get; set; }
+        public bool IsLocal { 
+            get 
+            { 
+                return Location != null;
+            } 
+        }
 
         public User? User { get; set; }
+
+        public ICollection<MissingPet>? MissingPets { get; set; }
+        public ICollection<MissingPetImage>? MissingPetImages { get; set; }
     }
 }

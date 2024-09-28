@@ -9,6 +9,8 @@ using AutoMapper;
 using NetTopologySuite.Geometries;
 using Application.Exceptions;
 using Presentation.WebApi.Data.DTOs.Variations;
+using Infrastructure.Exceptions;
+using Microsoft.IdentityModel.Tokens;
 
 
 namespace Presentation.WebApi.Controllers
@@ -17,13 +19,14 @@ namespace Presentation.WebApi.Controllers
     [Route("api/[controller]")]
     public class MissingPetController : BaseController
     {
-
         private readonly IMissingPetService _missingPetService;
+        private readonly ICommentService _commentService;
         private readonly IMapper _mapper;
 
-        public MissingPetController(IMissingPetService missingPetService, IMapper mapper, UserManager<User> userManager)
+        public MissingPetController(IMissingPetService missingPetService, ICommentService commentService, IMapper mapper, UserManager<User> userManager)
             : base(userManager) {
             _missingPetService = missingPetService;
+            _commentService = commentService;
             _mapper = mapper;
         }
 
@@ -67,6 +70,11 @@ namespace Presentation.WebApi.Controllers
             if (missingPet == null)
             {
                 return NotFound();
+            }
+
+            if (missingPet.Comments != null && missingPet.Comments.Count > 0)
+            {
+                missingPet.Comments = _commentService.FilterByRootLevelComments(missingPet.Comments).ToList();
             }
 
             MissingPetDTO missingPetDTO = _mapper.Map<MissingPetDTO>(missingPet);
@@ -200,6 +208,77 @@ namespace Presentation.WebApi.Controllers
             _missingPetService.Deactivate(missingPet);
 
             return NoContent();
+        }
+
+        [HttpPost("{id}/image"), Authorize]
+        public async Task<ActionResult<List<ImageDTO>>> AddImage([FromRoute] Guid id, [FromForm]IEnumerable<IFormFile> formFiles)
+        {
+            MissingPet? missingPet = _missingPetService.GetById(id);
+
+            if (missingPet == null)
+            {
+                return NotFound();
+            }
+
+            bool isNotOwnedByCurrentUser = !AreUserIdsFromCurrentUser(missingPet.UserId);
+            if (isNotOwnedByCurrentUser)
+            {
+                return Forbid();
+            }
+
+            List<ImageDTO> imageDTOs;
+            try
+            {
+                List<Image> images =  await _missingPetService.AddImage(missingPet, formFiles).ToListAsync();
+                imageDTOs = _mapper.Map<List<ImageDTO>>(images);
+            } 
+            catch (ValidationDomainException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (InvalidFileTypeInfrastructureException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+            return Ok(imageDTOs);
+        }
+
+        [HttpDelete("{id}/image/{imageId}"), Authorize]
+        public IActionResult RemoveImage([FromRoute] Guid id, [FromRoute] Guid imageId)
+        {
+            MissingPet? missingPet = _missingPetService.GetById(id);
+
+            if (missingPet == null)
+            {
+                return NotFound();
+            }
+
+            bool isNotOwnedByCurrentUser = !AreUserIdsFromCurrentUser(missingPet.UserId);
+            if (isNotOwnedByCurrentUser)
+            {
+                return Forbid();
+            }
+
+            Image? image = missingPet.Images?
+                .Where(img => img.Id == imageId)
+                .FirstOrDefault();
+
+            if (image == null)
+            {
+                return NotFound();
+            }
+
+            try
+            {
+                _missingPetService.RemoveImage(missingPet, image);
+            }
+            catch (ResourceNotFoundDomainException ex)
+            {
+                return NotFound(ex.Message);
+            }
+
+            return Ok();
         }
     }
 }

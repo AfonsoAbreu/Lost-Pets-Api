@@ -20,7 +20,8 @@ namespace Infrastructure.Data.EntityConfigs
                 .HasOne(e => e.Image)
                 .WithOne(e => e.User)
                 .HasForeignKey<User>(e => e.ImageId)
-                .IsRequired(false);
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

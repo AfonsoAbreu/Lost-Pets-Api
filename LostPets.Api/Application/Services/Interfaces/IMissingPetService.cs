@@ -1,4 +1,5 @@
 ﻿using Infrastructure.Data.Entities;
+using Microsoft.AspNetCore.Http;
 using NetTopologySuite.Geometries;
 
 namespace Application.Services.Interfaces
@@ -11,5 +12,7 @@ namespace Application.Services.Interfaces
         MissingPet Update(MissingPet missingPet);
         void Remove(MissingPet missingPet);
         void Deactivate(MissingPet missingPet);
+        IAsyncEnumerable<Image> AddImage(MissingPet missingPet, IEnumerable<IFormFile> formFile);
+        void RemoveImage(MissingPet missingPet, Image image);
     }
 }

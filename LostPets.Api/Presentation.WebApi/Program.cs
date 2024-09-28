@@ -14,6 +14,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -76,8 +77,8 @@ builder.Services.AddSwaggerGen(options =>
 
 var jwtSettings = new JwtFacadeSettings();
 builder.Configuration.Bind(jwtSettings.SectionName, jwtSettings);
-builder.Services.AddSingleton(Options.Create(jwtSettings));
 
+builder.Services.AddSingleton(Options.Create(jwtSettings));
 builder.Services.AddSingleton<IJwtFacade, JwtFacade>();
 
 builder.Services.AddAuthentication(options =>
@@ -98,6 +99,36 @@ builder.Services.AddAuthentication(options =>
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Secret)),
         };
     });
+
+#endregion
+
+#region Image Settings
+
+var imageSettings = new ImageFacadeSettings();
+builder.Configuration.Bind(imageSettings.SectionName, imageSettings);
+
+string uploadPath = builder.Environment.WebRootPath;
+if (imageSettings.UploadsSubFolder != null)
+{
+    uploadPath = Path.Combine(uploadPath, imageSettings.UploadsSubFolder);
+}
+
+imageSettings = new ImageFacadeSettings
+{
+    UploadsPath = uploadPath,
+    MaxImagesPerMissingPet = imageSettings.MaxImagesPerMissingPet,
+    AllowedImageTypes = imageSettings.AllowedImageTypes,
+    UploadsSubFolder = imageSettings.UploadsSubFolder,
+};
+
+builder.Services.AddSingleton(Options.Create(imageSettings));
+builder.Services.AddSingleton<IImageFacade, ImageFacade>();
+
+#endregion
+
+#region Server Settings
+
+builder.Services.AddSingleton<IServerFacade, ServerFacade>();
 
 #endregion
 
@@ -131,6 +162,8 @@ builder.Services.AddScoped<ISightingRepository, SightingRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IContactRepository, ContactRepository>();
+builder.Services.AddScoped<IImageRepository, ImageRepository>();
+builder.Services.AddScoped<IMissingPetImageRepository, MissingPetImageRepository>();
 
 #endregion
 

@@ -6,13 +6,15 @@ namespace Presentation.WebApi.Data.DTOs
 {
     public class MissingPetDTO : BaseEntityDTO
     {
-        [Required, MinLength(1)]
-        public ICollection<SightingDTO>? sightings { get; set; }
         public UserDTO? user { get; set; }
         [Required]
         public PetDTO? pet { get; set; }
-        public ICollection<CommentDTO>? comments { get; set; }
         [Required]
         public MissingPetStatusEnum? status { get; set; }
+
+        [Required, MinLength(1)]
+        public ICollection<SightingDTO>? sightings { get; set; }
+        public ICollection<ImageDTO>? images { get; set; }
+        public ICollection<CommentDTO>? comments { get; set; }
     }
 }

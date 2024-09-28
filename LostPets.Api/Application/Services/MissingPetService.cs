@@ -3,7 +3,12 @@ using Application.Services.Base;
 using Application.Services.Interfaces;
 using Infrastructure.Data;
 using Infrastructure.Data.Entities;
+using Infrastructure.Facades.Settings;
 using Infrastructure.Repositories.Interfaces;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using NetTopologySuite.Geometries;
 
 namespace Application.Services
@@ -17,8 +22,24 @@ namespace Application.Services
         protected readonly IPetService _petService;
         protected readonly ISightingService _sightingService;
         protected readonly ICommentService _commentService;
+        protected readonly IImageRepository _imageRepository;
+        protected readonly IMissingPetImageRepository _missingPetImageRepository;
 
-        public MissingPetService(ApplicationDbContext applicationDbContext, IMissingPetRepository missingPetRepository, IPetService petService, ISightingService sightingService, ICommentService commentService, ICommentRepository commentRepository, IPetRepository petRepository, ISightingRepository sightingRepository) : base(applicationDbContext)
+        protected readonly ImageFacadeSettings _imageFacadeSettings;
+
+        public MissingPetService(
+            ApplicationDbContext applicationDbContext, 
+            IMissingPetRepository missingPetRepository, 
+            IPetService petService, 
+            ISightingService sightingService, 
+            ICommentService commentService,
+            ICommentRepository commentRepository,
+            IPetRepository petRepository, 
+            ISightingRepository sightingRepository,
+            IImageRepository imageRepository,
+            IOptions<ImageFacadeSettings> imageOptions,
+            IMissingPetImageRepository missingPetImageRepository
+            ) : base(applicationDbContext)
         {
             _missingPetRepository = missingPetRepository;
             _sightingRepository = sightingRepository;
@@ -27,17 +48,20 @@ namespace Application.Services
             _petService = petService;
             _sightingService = sightingService;
             _commentService = commentService;
+            _imageRepository = imageRepository;
+            _imageFacadeSettings = imageOptions.Value;
+            _missingPetImageRepository = missingPetImageRepository;
         }
 
         public void Add(MissingPet missingPet)
         {
             if (missingPet.Sightings.Count == 0)
             {
-                throw new ValidationDomainException("A MissingPet must have at least one Sighting");
+                throw new ValidationDomainException("A MissingPet must have at least one Sighting.");
             }
             else if (missingPet.Comments == null || missingPet.Comments.Count != 0)
             {
-                throw new ValidationDomainException("A MissinPet must not be created with Comments.");
+                throw new ValidationDomainException("A MissingPet must not be created with Comments.");
             }
 
             _missingPetRepository.Add(missingPet);
@@ -51,8 +75,8 @@ namespace Application.Services
 
             if (missingPet != null)
             {
-                _missingPetRepository.ExplicitLoadCollection(missingPet, entity => entity.Sightings);
-                _missingPetRepository.ExplicitLoadCollection(missingPet, entity => entity.Comments);
+                _missingPetRepository.ExplicitLoadCollection(missingPet, entity => entity.Sightings, query => query.Include(sighting => sighting.User));
+                _missingPetRepository.ExplicitLoadCollection(missingPet, entity => entity.Comments, query => query.Include(comment => comment.User));
             }
 
             return missingPet;
@@ -65,7 +89,7 @@ namespace Application.Services
 
             foreach (MissingPet missingPet in missingPets)
             {
-                if (missingPet.Comments != null)
+                if (!missingPet.Comments.IsNullOrEmpty())
                 {
                     missingPet.Comments = _commentService.FilterByRootLevelComments(missingPet.Comments).ToList();
                 }
@@ -98,14 +122,14 @@ namespace Application.Services
                 existingMissingPet.Sightings = existingMissingPet.Sightings.Union(_sightingService.AddOrUpdate(missingPet.Sightings, false)).ToList();
             }
 
-            if (missingPet.Comments != null && missingPet.Comments.Count != 0)
+            if (!missingPet.Comments.IsNullOrEmpty())
             {
                 existingMissingPet.Comments = existingMissingPet.Comments?.Union(_commentService.AddOrUpdate(missingPet.Comments, false))?.ToList();
             }
             
             SaveChanges();
 
-            if (existingMissingPet.Comments != null)
+            if (!existingMissingPet.Comments.IsNullOrEmpty())
             {
                 existingMissingPet.Comments = _commentService.FilterByRootLevelComments(existingMissingPet.Comments).ToList();
             }
@@ -118,6 +142,12 @@ namespace Application.Services
             _commentRepository.RemoveWhere(comment => comment.MissingPetId == missingPet.Id);
             _sightingRepository.RemoveWhere(sighting => sighting.MissingPetId == missingPet.Id);
 
+            if (missingPet.Images != null && missingPet.MissingPetImages != null && missingPet.Images.Count > 0)
+            {
+                _missingPetImageRepository.RemoveWhere(image => missingPet.MissingPetImages.Contains(image));
+                _imageRepository.RemoveWhere(image => missingPet.Images.Contains(image));
+            }
+
             _petRepository.Remove(missingPet.Pet);
             _missingPetRepository.Remove(missingPet);
 
@@ -128,6 +158,54 @@ namespace Application.Services
         {
             _missingPetRepository.Attach(missingPet);
             missingPet.Status = MissingPetStatusEnum.DEACTIVATED;
+            SaveChanges();
+        }
+
+        public async IAsyncEnumerable<Image> AddImage(MissingPet missingPet, IEnumerable<IFormFile> formFile)
+        {
+            int remainingSlots = _imageFacadeSettings.MaxImagesPerMissingPet;
+
+            if (missingPet.Images != null)
+            {
+                remainingSlots -= missingPet.Images.Count;
+            }
+
+            if (remainingSlots < formFile.Count())
+            {
+                throw new ValidationDomainException($"A MissingPet cannot have more than {_imageFacadeSettings.MaxImagesPerMissingPet} images.");
+            }
+
+            foreach (var file in formFile)
+            {
+                Image image = await _imageRepository.SaveImage(file);
+
+                if (missingPet.Images == null)
+                {
+                    missingPet.Images = new List<Image>();
+                }
+
+                missingPet.Images.Add(image);
+
+                yield return image;
+            }
+
+            SaveChanges();
+        }
+
+        public void RemoveImage(MissingPet missingPet, Image image)
+        {
+            MissingPetImage? missingPetImage = missingPet.MissingPetImages
+                ?.Where(mpi => mpi.ImageId == image.Id)
+                .FirstOrDefault();
+
+            if (missingPetImage == null)
+            {
+                throw new ResourceNotFoundDomainException(ResourceNotFoundDomainException.DefaultMessage("Image"));
+            }
+
+            _missingPetImageRepository.Remove(missingPetImage);
+            _imageRepository.Remove(image);
+
             SaveChanges();
         }
     }
