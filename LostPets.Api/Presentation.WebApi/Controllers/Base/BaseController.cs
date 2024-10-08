@@ -1,6 +1,7 @@
 ﻿using Infrastructure.Data.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Presentation.WebApi.Controllers.Base.ObjectResults;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
@@ -45,6 +46,16 @@ namespace Presentation.WebApi.Controllers.Base
             }
 
             return ids.All(id => userId.Value == id);
+        }
+
+        protected InternalServerErrorObjectResult InternalServerError() 
+        { 
+            return InternalServerError(null);
+        }
+
+        protected InternalServerErrorObjectResult InternalServerError(object? value)
+        {
+            return new InternalServerErrorObjectResult(value);
         }
 
     }

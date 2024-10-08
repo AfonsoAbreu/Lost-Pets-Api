@@ -276,6 +276,10 @@ namespace Presentation.WebApi.Controllers
             {
                 return NotFound(ex.Message);
             }
+            catch (FileDeletionInfrastructureException)
+            {
+                return InternalServerError();
+            }
 
             return Ok();
         }
