@@ -8,6 +8,7 @@ namespace Presentation.WebApi.Data.DTOs.Variations
         [Required, EmailAddress]
         public string? email { get; set; }
         public string? userName { get; set; }
+        public ImageDTO? image { get; set; }
         public ICollection<SightingDTO>? sightings { get; set; }
         public ICollection<CommentDTO>? comments { get; set; }
         public ICollection<MissingPetDTO>? missingPets { get; set; }

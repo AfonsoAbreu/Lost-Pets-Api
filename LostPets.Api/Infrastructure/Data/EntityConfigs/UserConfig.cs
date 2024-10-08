@@ -17,6 +17,10 @@ namespace Infrastructure.Data.EntityConfigs
                 .AutoInclude();
 
             builder
+                .Navigation(e => e.Image)
+                .AutoInclude();
+
+            builder
                 .HasOne(e => e.Image)
                 .WithOne(e => e.User)
                 .HasForeignKey<User>(e => e.ImageId)

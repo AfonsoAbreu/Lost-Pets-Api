@@ -4,6 +4,7 @@ using Application.Services.Interfaces;
 using Infrastructure.Data;
 using Infrastructure.Data.Entities;
 using Infrastructure.Repositories.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 
 namespace Application.Services
@@ -12,11 +13,13 @@ namespace Application.Services
     {
         protected readonly IUserRepository _userRepository;
         protected readonly UserManager<User> _userManager;
+        protected readonly IImageRepository _imageRepository;
 
-        public UserService(ApplicationDbContext applicationDbContext, IUserRepository userRepository, UserManager<User> userManager) : base(applicationDbContext)
+        public UserService(ApplicationDbContext applicationDbContext, IUserRepository userRepository, UserManager<User> userManager, IImageRepository imageRepository) : base(applicationDbContext)
         {
             _userRepository = userRepository;
             _userManager = userManager;
+            _imageRepository = imageRepository;
         }
 
         public async Task CreateUserAsync(User user, string password)
@@ -72,6 +75,34 @@ namespace Application.Services
             _userRepository.ExplicitLoadCollection(user, u => u.MissingPets);
             _userRepository.ExplicitLoadCollection(user, u => u.Comments);
             _userRepository.ExplicitLoadCollection(user, u => u.Sightings);
+        }
+
+        public void RemoveImage(User user)
+        {
+            Image? image = user.Image;
+
+            if (image == null)
+            {
+                throw new ResourceNotFoundDomainException(ResourceNotFoundDomainException.DefaultMessage("Image"));
+            }
+
+            _imageRepository.Remove(image);
+
+            SaveChanges();
+        }
+
+        public async Task<Image> AddImage(User user, IFormFile file)
+        {
+            Image image = await _imageRepository.SaveImage(file);
+
+            if (user.Image != null)
+            {
+                RemoveImage(user);
+            }
+            user.Image = image;
+
+            SaveChanges();
+            return image;
         }
     }
 }

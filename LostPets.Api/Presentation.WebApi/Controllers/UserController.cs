@@ -2,10 +2,13 @@
 using Application.Services.Interfaces;
 using AutoMapper;
 using Infrastructure.Data.Entities;
+using Infrastructure.Exceptions;
 using Infrastructure.Facades.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.WebApi.Controllers.Base;
+using Presentation.WebApi.Data.DTOs;
 using Presentation.WebApi.Data.DTOs.ApiErrors;
 using Presentation.WebApi.Data.DTOs.Variations;
 using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
@@ -117,6 +120,57 @@ namespace Presentation.WebApi.Controllers
             }
 
             return Created();
+        }
+
+        [HttpPost("image"), Authorize]
+        public async Task<ActionResult<ImageDTO>> AddImage([FromForm] IFormFile formFile)
+        {
+            User? user = await GetCurrentUser();
+
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+
+            ImageDTO imageDTO;
+            try
+            {
+                Image newImage = await _userService.AddImage(user, formFile);
+                imageDTO = _mapper.Map<Image, ImageDTO>(newImage);
+            }
+            catch (InvalidFileTypeInfrastructureException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+            return Ok(imageDTO);
+        }
+
+        [HttpDelete("image"), Authorize]
+        public async Task<IActionResult> RemoveImage()
+        {
+            User? user = await GetCurrentUser();
+
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+
+            if (user.Image == null)
+            {
+                return NotFound();
+            }
+
+            try
+            {
+                _userService.RemoveImage(user);
+            }
+            catch (InvalidFileTypeInfrastructureException)
+            {
+                return InternalServerError();
+            }
+
+            return Ok();
         }
     }
 }
