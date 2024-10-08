@@ -139,7 +139,6 @@ namespace Application.Services
 
         public void Remove(MissingPet missingPet)
         {
-            //TODO: Fiz all of the RemoveWhere calls
             _commentRepository.RemoveWhere(comment => comment.MissingPetId == missingPet.Id);
             _sightingRepository.RemoveWhere(sighting => sighting.MissingPetId == missingPet.Id);
 

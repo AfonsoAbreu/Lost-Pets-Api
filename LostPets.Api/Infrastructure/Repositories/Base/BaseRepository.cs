@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Query;
 using System.Linq.Expressions;
+using System.Linq;
 
 namespace Infrastructure.Repositories.Base
 {
@@ -73,6 +74,10 @@ namespace Infrastructure.Repositories.Base
 
         public virtual int RemoveWhere(Expression<Func<T, bool>> where)
         {
+            Func<T, bool> compiledWhere = where.Compile();
+
+            DetachWhere(compiledWhere);
+
             return GetSet()
                 .Where(where)
                 .ExecuteDelete();
@@ -80,6 +85,10 @@ namespace Infrastructure.Repositories.Base
 
         public virtual int UpdateWhere(Expression<Func<T, bool>> where, Expression<Func<SetPropertyCalls<T>, SetPropertyCalls<T>>> set)
         {
+            Func<T, bool> compiledWhere = where.Compile();
+
+            DetachWhere(compiledWhere);
+
             return GetSet()
                 .Where(where)
                 .ExecuteUpdate(set);
@@ -113,6 +122,16 @@ namespace Infrastructure.Repositories.Base
             query.Load();
         }
 
+        protected virtual void Detach(EntityEntry<T> entry)
+        {
+            entry.State = EntityState.Detached;
+        }
+
+        protected virtual void Attach(EntityEntry<T> entry)
+        {
+            _context.Attach(entry);
+        }
+
         public virtual void Detach(T entity)
         {
             GetEntry(entity).State = EntityState.Detached;
@@ -134,6 +153,18 @@ namespace Infrastructure.Repositories.Base
             foreach (var entity in entities)
             {
                 Detach(entity);
+            }
+        }
+
+        protected virtual void DetachWhere(Func<T, bool> where)
+        {
+            IEnumerable<EntityEntry<T>> entries = _context.ChangeTracker
+                .Entries<T>()
+                .Where(entry => where(entry.Entity));
+
+            foreach (EntityEntry<T> entry in entries)
+            {
+                Detach(entry);
             }
         }
 
