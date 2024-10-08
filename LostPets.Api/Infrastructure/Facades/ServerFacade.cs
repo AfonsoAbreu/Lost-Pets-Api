@@ -26,9 +26,21 @@ namespace Infrastructure.Facades
                 throw new NoHostedUrlDetectedInfrastructureException(NoHostedUrlDetectedInfrastructureException.DefaultMessage());
             }
 
-            return addresses
+            string? httpsAddress = addresses
                 .Where(address => address.StartsWith("https"))
-                .First();
+                .FirstOrDefault();
+
+            if (httpsAddress != null)
+            {
+                return httpsAddress;
+            }
+
+            string? httpAddress = addresses
+                .Where(address => address.StartsWith("http"))
+                .FirstOrDefault();
+
+            return httpAddress
+                ?? throw new NoHostedUrlDetectedInfrastructureException(NoHostedUrlDetectedInfrastructureException.DefaultMessage());
         }
     }
 }
