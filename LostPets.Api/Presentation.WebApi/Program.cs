@@ -128,6 +128,10 @@ builder.Services.AddSingleton<IImageFacade, ImageFacade>();
 
 #region Server Settings
 
+var serverSettings = new ServerFacadeSettings();
+builder.Configuration.Bind(serverSettings.SectionName, serverSettings);
+
+builder.Services.AddSingleton(Options.Create(serverSettings));
 builder.Services.AddSingleton<IServerFacade, ServerFacade>();
 
 #endregion
