@@ -22,11 +22,6 @@ namespace Infrastructure.Facades
                 throw new InvalidFileTypeInfrastructureException(InvalidFileTypeInfrastructureException.DefaultMessage(fileType));
             }
 
-            if (!Directory.Exists(_settings.UploadsPath))
-            {
-                Directory.CreateDirectory(_settings.UploadsPath);
-            }
-
             string fullFilePath = Path.Combine(_settings.UploadsPath, fileName);
 
             fullFilePath = Path.ChangeExtension(fullFilePath, fileType);

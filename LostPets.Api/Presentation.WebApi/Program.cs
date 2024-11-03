@@ -14,7 +14,6 @@ using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -120,6 +119,11 @@ imageSettings = new ImageFacadeSettings
     AllowedImageTypes = imageSettings.AllowedImageTypes,
     UploadsSubFolder = imageSettings.UploadsSubFolder,
 };
+
+if (!Directory.Exists(imageSettings.UploadsPath))
+{
+    Directory.CreateDirectory(imageSettings.UploadsPath);
+}
 
 builder.Services.AddSingleton(Options.Create(imageSettings));
 builder.Services.AddSingleton<IImageFacade, ImageFacade>();
