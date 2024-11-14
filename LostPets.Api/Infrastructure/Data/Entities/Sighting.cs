@@ -7,6 +7,7 @@ namespace Infrastructure.Data.Entities
     {
         public DateTime SightingDate { get; set; }
         public required Point Location { get; set; }
+        public required string Address { get; set; }
         public string? Description { get; set; }
 
         public Guid UserId { get; set; }
