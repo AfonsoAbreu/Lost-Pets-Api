@@ -75,6 +75,11 @@ namespace Application.Services
 
             if (missingPet != null)
             {
+                if (missingPet.Status == MissingPetStatusEnum.DEACTIVATED)
+                {
+                    throw new ResourceNotFoundDomainException(ResourceNotFoundDomainException.DefaultMessage("Missing Pet"));
+                }
+
                 _missingPetRepository.ExplicitLoadCollection(missingPet, entity => entity.Sightings, query => query.Include(sighting => sighting.User));
                 _missingPetRepository.ExplicitLoadCollection(missingPet, entity => entity.Comments, query => query.Include(comment => comment.User));
             }
