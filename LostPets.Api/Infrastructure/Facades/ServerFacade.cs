@@ -18,7 +18,7 @@ namespace Infrastructure.Facades
             _server = server;
         }
 
-        public string GetHostedUrl()
+        private string GetUnformattedHostedUrl()
         {
             if (_settings.HostedUrl != null)
             {
@@ -50,6 +50,18 @@ namespace Infrastructure.Facades
 
             return httpAddress
                 ?? throw new NoHostedUrlDetectedInfrastructureException(NoHostedUrlDetectedInfrastructureException.DefaultMessage());
+        }
+
+        public string GetHostedUrl()
+        {
+            string url = GetUnformattedHostedUrl();
+
+            if (!url.EndsWith('/'))
+            {
+                url += "/";
+            }
+
+            return url;
         }
     }
 }

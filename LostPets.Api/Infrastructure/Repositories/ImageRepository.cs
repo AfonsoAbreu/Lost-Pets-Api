@@ -35,7 +35,7 @@ namespace Infrastructure.Repositories
             string fileName = Guid.NewGuid().ToString();
             string fileExtension = file.GetFileExtension();
             string hostedUrl = _serverFacade.GetHostedUrl();
-            string url = $"{hostedUrl}/{_imageFacadeSettings.UploadsSubFolder}/{fileName}.{fileExtension}";
+            string url = $"{hostedUrl}{_imageFacadeSettings.UploadsSubFolder}/{fileName}.{fileExtension}";
             string filePath = await _imageFacade.SaveImage(file, fileName);
 
             var image = new Image 
