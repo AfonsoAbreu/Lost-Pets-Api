@@ -209,6 +209,27 @@ namespace Presentation.WebApi.Controllers
             return NoContent();
         }
 
+        [HttpPost("{id}/activate"), Authorize]
+        public IActionResult Activate([FromRoute] Guid id)
+        {
+            MissingPet? missingPet = _missingPetService.GetById(id, true);
+
+            if (missingPet == null)
+            {
+                return NotFound();
+            }
+
+            bool isNotOwnedByCurrentUser = !AreUserIdsFromCurrentUser(missingPet.UserId);
+            if (isNotOwnedByCurrentUser)
+            {
+                return Forbid();
+            }
+
+            _missingPetService.Activate(missingPet);
+
+            return NoContent();
+        }
+
         [HttpPost("{id}/image"), Authorize]
         public async Task<ActionResult<List<ImageDTO>>> AddImage([FromRoute] Guid id, [FromForm]IEnumerable<IFormFile> formFiles)
         {

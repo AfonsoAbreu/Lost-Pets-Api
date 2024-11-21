@@ -69,15 +69,15 @@ namespace Application.Services
             SaveChanges();
         }
 
-        public MissingPet? GetById(Guid id)
+        public MissingPet? GetById(Guid id, bool allowDeactivated = false)
         {
             MissingPet? missingPet = _missingPetRepository.GetById(id);
 
             if (missingPet != null)
             {
-                if (missingPet.Status == MissingPetStatusEnum.DEACTIVATED)
+                if (!allowDeactivated && missingPet.Status == MissingPetStatusEnum.DEACTIVATED)
                 {
-                    throw new ResourceNotFoundDomainException(ResourceNotFoundDomainException.DefaultMessage("Missing Pet"));
+                    return null;
                 }
 
                 _missingPetRepository.ExplicitLoadCollection(missingPet, entity => entity.Sightings, query => query.Include(sighting => sighting.User));
@@ -164,6 +164,16 @@ namespace Application.Services
             _missingPetRepository.Attach(missingPet);
             missingPet.Status = MissingPetStatusEnum.DEACTIVATED;
             SaveChanges();
+        }
+
+        public void Activate(MissingPet missingPet)
+        {
+            if (missingPet.Status == MissingPetStatusEnum.DEACTIVATED)
+            {
+                _missingPetRepository.Attach(missingPet);
+                missingPet.Status = MissingPetStatusEnum.LOST;
+                SaveChanges();
+            }
         }
 
         public async IAsyncEnumerable<Image> AddImage(MissingPet missingPet, IEnumerable<IFormFile> formFile)
